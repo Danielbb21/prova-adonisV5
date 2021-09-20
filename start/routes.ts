@@ -47,4 +47,10 @@ Route.resource('games', 'GamesController')
     '*': ['auth']
   });
 
+Route.resource('gamble', 'GamblesController')
+    .apiOnly()
+    .middleware({
+      '*': ['auth']
+    })
+
 
