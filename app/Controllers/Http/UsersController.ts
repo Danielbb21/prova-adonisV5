@@ -1,3 +1,4 @@
+import Mail from '@ioc:Adonis/Addons/Mail';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User';
 
@@ -13,6 +14,14 @@ export default class UsersController {
     const user = await User.create({name, email, password, isAdmin});
 
     await user.save();
+    await Mail.sendLater((message) => {
+      message
+        .from('tgl@teste.com')
+        .to(user.email)
+        .subject('Welcome')
+        .htmlView('emails/new_user', {name: user.name, link: 'localhost:3000'})
+    });
+
     return response.status(201).json(user);
   }
   public async index({ response}:HttpContextContract){
