@@ -25,6 +25,11 @@ Route.get('/', async () => {
 })
 
 Route.group(() => {
+  Route.post('/forget', 'ForgetPasswordsController.store')
+  Route.put('/reset', 'ForgetPasswordsController.resetPassword')
+}).prefix('/password')
+
+Route.group(() => {
     Route.post('/', 'UsersController.create')
     Route.group(() => {
       Route.get('/', 'UsersController.index')

@@ -18,6 +18,12 @@ export default class User extends BaseModel {
   @column({columnName: 'isAdmin'})
   public isAdmin: boolean;
 
+  @column()
+  token: string;
+
+  @column()
+  token_created_at: Date | null;
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
