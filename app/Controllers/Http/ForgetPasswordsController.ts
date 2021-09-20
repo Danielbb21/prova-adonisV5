@@ -1,6 +1,7 @@
 import User  from 'App/Models/User';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import crypto from 'crypto';
+import Mail from '@ioc:Adonis/Addons/Mail';
 
 import { addHours,  isAfter } from 'date-fns';
 
@@ -18,7 +19,13 @@ export default class ForgetPasswordsController {
     userExists.token_created_at = new Date();
 
     await userExists.save();
-
+    await Mail.send((message) => {
+      message
+        .from('tgl@teste.com')
+        .to(userExists.email)
+        .subject('Forget Password')
+        .htmlView('emails/forget', {name: userExists.name,email: userExists.email, token: userExists.token})
+    })
     return userExists;
   }
 
