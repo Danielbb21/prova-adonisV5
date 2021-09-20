@@ -21,10 +21,11 @@ export default class UsersController {
     return response.json(users);
   }
 
-  public async update({request, response}: HttpContextContract){
+  public async update({request, response, auth}: HttpContextContract){
     const data = request.all();
-    const {id} = request.params();
-    const userExist = await User.find(id);
+    // console.log('auth', auth.user?.id);
+    // const {id} = request.params();
+    const userExist = await User.find(auth.user?.id);
     if(!userExist){
       return response.status(400).json({error: 'User not found'});
 

@@ -26,8 +26,14 @@ Route.get('/', async () => {
 
 Route.group(() => {
     Route.post('/', 'UsersController.create')
-    Route.get('/', 'UsersController.index')
-    Route.put('/:id', 'UsersController.update')
+    Route.group(() => {
+      Route.get('/', 'UsersController.index')
+      Route.put('/', 'UsersController.update')
+
+    }).middleware('auth')
     Route.delete('/:id', 'UsersController.delete')
 }).prefix('/users');
+
+Route.post('/login', 'AuthController.create')
+
 
