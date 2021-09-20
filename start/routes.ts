@@ -26,5 +26,8 @@ Route.get('/', async () => {
 
 Route.group(() => {
     Route.post('/', 'UsersController.create')
+    Route.get('/', 'UsersController.index')
+    Route.put('/:id', 'UsersController.update')
+    Route.delete('/:id', 'UsersController.delete')
 }).prefix('/users');
 

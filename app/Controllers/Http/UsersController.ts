@@ -15,4 +15,34 @@ export default class UsersController {
     await user.save();
     return response.status(201).json(user);
   }
+  public async index({ response}:HttpContextContract){
+
+    const users = await User.all();
+    return response.json(users);
+  }
+
+  public async update({request, response}: HttpContextContract){
+    const data = request.all();
+    const {id} = request.params();
+    const userExist = await User.find(id);
+    if(!userExist){
+      return response.status(400).json({error: 'User not found'});
+
+    }
+
+    await userExist.merge(data).save();
+
+    return userExist;
+  }
+
+  public async delete({request, response}: HttpContextContract){
+    const {id} = request.params();
+    const user = await User.find(id);
+    if(!user){
+     return  response.status(400).json({error: 'User not found'});
+    }
+
+    await user.delete();
+    return response.status(200).json('ok');
+  }
 }
