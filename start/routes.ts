@@ -30,15 +30,21 @@ Route.group(() => {
 }).prefix('/password')
 
 Route.group(() => {
-    Route.post('/', 'UsersController.create')
-    Route.group(() => {
-      Route.get('/', 'UsersController.index')
-      Route.put('/', 'UsersController.update')
+  Route.post('/', 'UsersController.create')
+  Route.group(() => {
+    Route.get('/', 'UsersController.index')
+    Route.put('/', 'UsersController.update')
 
-    }).middleware('auth')
-    Route.delete('/:id', 'UsersController.delete')
+  }).middleware('auth')
+  Route.delete('/:id', 'UsersController.delete')
 }).prefix('/users');
 
 Route.post('/login', 'AuthController.create')
+
+Route.resource('games', 'GamesController')
+  .apiOnly()
+  .middleware({
+    '*': ['auth']
+  });
 
 
