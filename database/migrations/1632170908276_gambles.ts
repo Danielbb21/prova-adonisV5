@@ -10,19 +10,18 @@ export default class Gambles extends BaseSchema {
       table
         .integer('user_id')
         .unsigned()
-        .references('id')
-        .inTable('users')
+        .references('users.id')
         .onUpdate('CASCADE')
         .onDelete('CASCADE')
-        .notNullable()
+
       table
         .integer('game_id')
         .unsigned()
-        .references('id')
-        .inTable('games')
+        .references('games.id')
+
         .onUpdate('CASCADE')
         .onDelete('SET NULL')
-        .notNullable()
+
       table.decimal('price').notNullable()
       table.timestamp('game_date')
       table.timestamp('created_at', { useTz: true })
