@@ -1,12 +1,14 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Game from 'App/Models/Game';
+import CreateGameValidator from 'App/Validators/CreateGameValidator';
+import UpdateGameValidator from 'App/Validators/UpdateGameValidator';
 
 
 export default class GamesController {
 
   public async store({ request, response }: HttpContextContract) {
     const data = request.all();
-
+    await request.validate(CreateGameValidator);
     const game = new Game();
     const gameAlreadyExists = await Game.findBy('type', data.type);
     if (gameAlreadyExists) {
@@ -33,6 +35,7 @@ export default class GamesController {
       const { id } = request.params();
 
       const data = request.all();
+      await request.validate(UpdateGameValidator);
       const game = await Game.find(id);
       if (!game) {
         return response.status(400).json({ error: 'Game not found' });

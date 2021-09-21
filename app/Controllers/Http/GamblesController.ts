@@ -3,6 +3,8 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Gamble from 'App/Models/Gamble';
 import User from 'App/Models/User';
 import Game from 'App/Models/Game';
+import CreateGambleValidator from 'App/Validators/CreateGambleValidator';
+import UpdateGambleValidator from 'App/Validators/UpdateGambleValidator';
 
 const formatDate = (date) => {
 
@@ -19,6 +21,7 @@ export default class GamblesController {
 
   public async store({ request, response, auth }: HttpContextContract) {
     const data = request.only(['data']);
+    await request.validate(CreateGambleValidator);
 
     const user = await User.find(auth.user?.id);
     if (!user) {
@@ -79,6 +82,7 @@ export default class GamblesController {
     const { id } = request.params();
     const gamble = await Gamble.find(id);
     const data = request.all();
+    await request.validate(UpdateGambleValidator);
     if (!gamble) {
       return response.status(400).json({ error: 'Gamble not found' })
     }

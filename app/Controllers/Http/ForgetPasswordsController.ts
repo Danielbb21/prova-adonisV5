@@ -4,11 +4,14 @@ import crypto from 'crypto';
 import Mail from '@ioc:Adonis/Addons/Mail';
 
 import { addHours,  isAfter } from 'date-fns';
+import ForgetPasswordValidator from 'App/Validators/ForgetPasswordValidator';
+import ResetPasswordValidator from 'App/Validators/ResetPasswordValidator';
 
 export default class ForgetPasswordsController {
 
   public async store({request, response}: HttpContextContract){
     const {email} = request.only(['email']);
+    await request.validate(ForgetPasswordValidator);
     const userExists = await User.findBy('email', email);
     const cry = crypto.randomBytes(10).toString('hex');
 
@@ -32,6 +35,7 @@ export default class ForgetPasswordsController {
   public async resetPassword({request, response}: HttpContextContract){
       const {token, password} = request.only(['token', 'password']);
       const user = await User.findBy('token', token);
+      await request.validate(ResetPasswordValidator);
 
       if(!user){
         return response.status(400).json({error:'User not found'});

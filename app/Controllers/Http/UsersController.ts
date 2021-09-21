@@ -1,12 +1,14 @@
 import Mail from '@ioc:Adonis/Addons/Mail';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User';
+import CreateUserValidator from 'App/Validators/CreateUserValidator';
+import UpdateUserValidator from 'App/Validators/UpdateUserValidator';
 
 export default class UsersController {
 
   public async create({ request, response }: HttpContextContract) {
     const { name, email, password, isAdmin } = request.only(['name', 'email', 'password', 'isAdmin']);
-
+    await request.validate(CreateUserValidator);
     const userExists = await User.findBy('email', email);
     if(userExists){
       return response.status(400).json({error: 'This email is already in use'});
@@ -31,7 +33,8 @@ export default class UsersController {
   }
 
   public async update({request, response, auth}: HttpContextContract){
-    const data = request.all();
+    const data = request.only(['name', 'email', 'password']);
+    await request.validate(UpdateUserValidator);
     // console.log('auth', auth.user?.id);
     // const {id} = request.params();
     const userExist = await User.find(auth.user?.id);
