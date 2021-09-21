@@ -18,12 +18,12 @@ export default class Gamble extends BaseModel {
   public game_date: Date;
 
   @belongsTo(() => Game, {
-    localKey: 'game_id'
+    foreignKey: 'game_id',
   })
   public game: BelongsTo<typeof Game>
 
   @belongsTo(() => User, {
-    localKey: 'user_id'
+    foreignKey: 'user_id',
   })
   public user: BelongsTo<typeof User>
 
