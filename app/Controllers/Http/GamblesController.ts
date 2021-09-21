@@ -17,6 +17,15 @@ const formatDate = (date) => {
   return `${day}/${month}/${year}`;
 }
 
+const formatDate2 = (date) => {
+  const dateSeperated = date.split('/');
+  const day = dateSeperated[0];
+  const month = dateSeperated[1];
+  const year = dateSeperated[2];
+
+  return `${year}-${month}-${day}`;
+}
+
 export default class GamblesController {
 
   public async store({ request, response, auth }: HttpContextContract) {
@@ -72,9 +81,11 @@ export default class GamblesController {
 
   public async index({  request,response, auth }: HttpContextContract) {
     if (auth.user?.id) {
+      const date = new Date();
+      const formatedDate = formatDate2(date.toLocaleDateString());
       console.log(request.qs());
       const {page} = request.qs();
-      const gambles = await Gamble.query().where('user_id', auth.user.id).preload('user').preload('game').paginate(page, 10);
+      const gambles = await Gamble.query().where('user_id', auth.user.id).whereBetween('game_date', [formatedDate + 'T00:00:00.000Z', formatedDate + 'T23:59:17.000Z']).preload('user').preload('game').paginate(page, 10);
 
       return response.json(gambles);
     }
