@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import Gamble from './Gamble';
 
 export default class Game extends BaseModel {
   @column({ isPrimary: true })
@@ -25,6 +26,13 @@ export default class Game extends BaseModel {
 
   @column({columnName: 'min-cart-value'})
   public minCartValue: number;
+
+  @hasMany(() => Gamble, {
+    foreignKey: 'user_id', // defaults to userId
+  })
+
+  public gambles: HasMany<typeof Gamble>
+
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
