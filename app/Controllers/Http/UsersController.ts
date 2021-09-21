@@ -10,10 +10,10 @@ export default class UsersController {
     const { name, email, password, isAdmin } = request.only(['name', 'email', 'password', 'isAdmin']);
     await request.validate(CreateUserValidator);
     const userExists = await User.findBy('email', email);
-    if(userExists){
-      return response.status(400).json({error: 'This email is already in use'});
+    if (userExists) {
+      return response.status(400).json({ error: 'This email is already in use' });
     }
-    const user = await User.create({name, email, password, isAdmin});
+    const user = await User.create({ name, email, password, isAdmin });
 
     await user.save();
     await Mail.sendLater((message) => {
@@ -21,25 +21,25 @@ export default class UsersController {
         .from('tgl@teste.com')
         .to(user.email)
         .subject('Welcome')
-        .htmlView('emails/new_user', {name: user.name, link: 'localhost:3000'})
+        .htmlView('emails/new_user', { name: user.name, link: 'localhost:3000' })
     });
 
     return response.status(201).json(user);
   }
-  public async index({ response}:HttpContextContract){
+  public async index({ response }: HttpContextContract) {
 
     const users = await User.all();
     return response.json(users);
   }
 
-  public async update({request, response, auth}: HttpContextContract){
+  public async update({ request, response, auth }: HttpContextContract) {
     const data = request.only(['name', 'email', 'password']);
     await request.validate(UpdateUserValidator);
     // console.log('auth', auth.user?.id);
     // const {id} = request.params();
     const userExist = await User.find(auth.user?.id);
-    if(!userExist){
-      return response.status(400).json({error: 'User not found'});
+    if (!userExist) {
+      return response.status(400).json({ error: 'User not found' });
 
     }
 
@@ -48,14 +48,26 @@ export default class UsersController {
     return userExist;
   }
 
-  public async delete({request, response}: HttpContextContract){
-    const {id} = request.params();
+  public async delete({ request, response }: HttpContextContract) {
+    const { id } = request.params();
     const user = await User.find(id);
-    if(!user){
-     return  response.status(400).json({error: 'User not found'});
+    if (!user) {
+      return response.status(400).json({ error: 'User not found' });
     }
 
     await user.delete();
     return response.status(200).json('ok');
+  }
+
+  public async show({ auth, response }: HttpContextContract) {
+    const user = await User.find(auth.user?.id);
+    if(auth.user?.id){
+
+      if (!user) {
+        return response.status(400).json({ error: 'User not found' });
+      }
+      const all = await User.query().withCount('gambles').preload('gambles').where('id', auth.user.id);
+      return all;
+    }
   }
 }

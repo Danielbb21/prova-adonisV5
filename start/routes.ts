@@ -34,7 +34,7 @@ Route.group(() => {
   Route.group(() => {
     Route.get('/', 'UsersController.index')
     Route.put('/', 'UsersController.update')
-
+    Route.get('/games', 'UsersController.show')
   }).middleware('auth')
   Route.delete('/:id', 'UsersController.delete')
 }).prefix('/users');

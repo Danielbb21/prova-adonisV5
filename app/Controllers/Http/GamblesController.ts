@@ -70,10 +70,12 @@ export default class GamblesController {
 
   }
 
-  public async index({  response, auth }: HttpContextContract) {
+  public async index({  request,response, auth }: HttpContextContract) {
     if (auth.user?.id) {
+      console.log(request.qs());
+      const {page} = request.qs();
+      const gambles = await Gamble.query().where('user_id', auth.user.id).paginate(page,10);
 
-      const gambles = await Gamble.query().where('user_id', auth.user.id);
       return response.json(gambles);
     }
   }
