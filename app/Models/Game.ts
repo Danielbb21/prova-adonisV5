@@ -30,7 +30,6 @@ export default class Game extends BaseModel {
   @hasMany(() => Gamble, {
     foreignKey: 'user_id', // defaults to userId
   })
-
   public gambles: HasMany<typeof Gamble>
 
 

@@ -1,23 +1,12 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Gamble from 'App/Models/Gamble';
-import Game from 'App/Models/Game';
 import User from 'App/Models/User';
-interface Teste {
-  gameNumbers: string;
-  price: number;
-  game_date: string;
-  game: number;
-  user_id: number;
-  game_id: number;
-}
 
 export default class GamblesController {
 
   public async store({ request, response, auth }: HttpContextContract) {
     const data = request.only(['data']);
 
-    // const { gameNumbers, price, game_date, game_id } = request.only(['gameNumbers', 'price', 'game_date', 'game_id']);
-    const gamble = new Gamble();
     const user = await User.find(auth.user?.id);
     if (!user) {
       return response.status(400).json({ error: 'User not found' });
@@ -25,12 +14,12 @@ export default class GamblesController {
 
     if (auth.user?.id) {
       const id = auth.user.id;
-      const game = new Game();
+
       const k: Gamble[] = [];
 
 
-      let teste: Teste[] = [];
-      data.data.map(element =>{
+
+      data.data.map(element => {
         console.log('element', element);
         const a = new Gamble();
         a.gameNumbers = element.gameNumbers.toString();
@@ -44,9 +33,47 @@ export default class GamblesController {
       })
 
       await user.related('gambles').saveMany(k);
-      return response.json(user);
+      const returnedElemenents = k.map((element) => {
+        return { game_numbers: element.gameNumbers, price: element.price, game_id: element.game_id };
+      });
+      return response.json(returnedElemenents);
     }
 
 
+  }
+
+  public async index({  response, auth }: HttpContextContract) {
+    if (auth.user?.id) {
+
+      const gambles = await Gamble.query().where('user_id', auth.user.id);
+      return response.json(gambles);
+    }
+  }
+
+  public async update({ request, response }: HttpContextContract) {
+    const { id } = request.params();
+    const gamble = await Gamble.find(id);
+    const data = request.all();
+    if (!gamble) {
+      return response.status(400).json({ error: 'Gamble not found' })
+    }
+    await gamble.merge(data).save();
+
+    return gamble;
+
+  }
+
+  public async destroy({request, response}:HttpContextContract){
+      const {id} = request.params();
+      const gamble = await Gamble.find(id);
+
+      if(!gamble){
+        return response.status(400).json({error: 'Gamble not found'});
+
+      }
+
+      await gamble.delete();
+
+      return response.json({message: 'deleted'})
   }
 }
