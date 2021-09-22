@@ -12,8 +12,8 @@ export default class GamesController {
     await request.validate(CreateGameValidator);
     const game = new Game();
     const user = await User.find(auth.user?.id);
-    if(!user){
-      return response.status(400).json({error: 'user not found'});
+    if (!user) {
+      return response.status(400).json({ error: 'user not found' });
     }
     await bouncer.authorize('games')
 
@@ -38,15 +38,17 @@ export default class GamesController {
   }
 
   public async update({ request, response, bouncer, auth }: HttpContextContract) {
+    const user = await User.find(auth.user?.id);
+    if (!user) {
+      return response.status(400).json({ error: 'user not found' });
+    }
+    await bouncer.authorize('games');
     try {
       const { id } = request.params();
 
       const data = request.all();
-      const user = await User.find(auth.user?.id);
-      if(!user){
-        return response.status(400).json({error: 'user not found'});
-      }
-      await bouncer.authorize('games');
+
+
 
       const game = await Game.find(id);
       if (!game) {
@@ -59,27 +61,29 @@ export default class GamesController {
       return game;
     }
     catch (err) {
-        return response.status(500).json({error: err.message});
+      return response.status(500).json({ error: err.message });
     }
   }
 
-  public async destroy({request, response,auth, bouncer}:HttpContextContract){
-      try{
-        const {id} = request.params();
-        const game = await Game.find(id);
-        const user = await User.find(auth.user?.id);
-        if(!user){
-          return response.status(400).json({error: 'user not found'});
-        }
-        await bouncer.authorize('games')
-        if(!game){
-          return response.status(400).json({error: 'Game not found'});
-        }
-        await game.delete();
-        return response.json('ok');
+  public async destroy({ request, response, auth, bouncer }: HttpContextContract) {
+    const user = await User.find(auth.user?.id);
+    if (!user) {
+      return response.status(400).json({ error: 'user not found' });
+    }
+    await bouncer.authorize('games');
+
+    try {
+      const { id } = request.params();
+      const game = await Game.find(id);
+
+      if (!game) {
+        return response.status(400).json({ error: 'Game not found' });
       }
-      catch(err){
-        return response.status(500).json({error: err.message})
-      }
+      await game.delete();
+      return response.json('ok');
+    }
+    catch (err) {
+      return response.status(500).json({ error: err.message })
+    }
   }
 }

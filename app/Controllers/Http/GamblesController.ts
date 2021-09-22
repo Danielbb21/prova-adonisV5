@@ -80,6 +80,7 @@ export default class GamblesController {
   }
 
   public async index({  request,response, auth }: HttpContextContract) {
+
     if (auth.user?.id) {
       const date = new Date();
       const formatedDate = formatDate2(date.toLocaleDateString());
@@ -91,21 +92,24 @@ export default class GamblesController {
     }
   }
 
-  public async update({ request, response }: HttpContextContract) {
+  public async update({ request, response, bouncer }: HttpContextContract) {
     const { id } = request.params();
     const gamble = await Gamble.find(id);
+
     const data = request.all();
     await request.validate(UpdateGambleValidator);
     if (!gamble) {
       return response.status(400).json({ error: 'Gamble not found' })
     }
+    await bouncer.authorize('userBets', gamble);
+
     await gamble.merge(data).save();
 
     return gamble;
 
   }
 
-  public async destroy({request, response}:HttpContextContract){
+  public async destroy({request, response, bouncer}:HttpContextContract){
       const {id} = request.params();
       const gamble = await Gamble.find(id);
 
@@ -113,7 +117,7 @@ export default class GamblesController {
         return response.status(400).json({error: 'Gamble not found'});
 
       }
-
+      await bouncer.authorize('userBets', gamble);
       await gamble.delete();
 
       return response.json({message: 'deleted'})

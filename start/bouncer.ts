@@ -6,6 +6,8 @@
  */
 
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
+import Gamble from 'App/Models/Gamble';
+
 import User from 'App/Models/User'
 
 /*
@@ -32,8 +34,20 @@ import User from 'App/Models/User'
 */
 export const { actions } = Bouncer
   .define('games', (user: User) => {
-    return user.isAdmin == true;
+    if (user.isAdmin == true) {
+
+      return true;
+    }
+    return Bouncer.deny('Unauthorized', 403)
   })
+  .define('userBets', (user: User, gamble: Gamble) => {
+      if(gamble.user_id === user.id){
+        return true;
+      }
+
+      return Bouncer.deny('This Bet is not yours', 403)
+  })
+
 
 /*
 |--------------------------------------------------------------------------
