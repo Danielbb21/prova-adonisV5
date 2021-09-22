@@ -56,8 +56,13 @@ export default class GamblesController {
         k.push(a);
 
       })
+      // user.last_game_date = new Date();
+      const t = new Date('2021-09-16T18:19:05.653Z');
+      user.last_game_date = t;
 
+      // user.last_game_date = Date.parse('2021-09-14T18:11:00.763Z');
       await user.related('gambles').saveMany(k);
+
       const games = await Game.all();
 
       const returnedElemenents = k.map((element) => {

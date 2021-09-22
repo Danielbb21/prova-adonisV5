@@ -37,6 +37,8 @@ Route.group(() => {
     Route.get('/games', 'UsersController.show')
   }).middleware('auth')
   Route.delete('/:id', 'UsersController.delete')
+
+  Route.get('/abcent', 'UsersController.absentUsers')
 }).prefix('/users');
 
 Route.post('/login', 'AuthController.create')
@@ -48,9 +50,8 @@ Route.resource('games', 'GamesController')
   });
 
 Route.resource('gamble', 'GamblesController')
-    .apiOnly()
-    .middleware({
-      '*': ['auth']
-    })
-
+  .apiOnly()
+  .middleware({
+    '*': ['auth']
+  })
 

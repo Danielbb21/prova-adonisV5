@@ -25,6 +25,9 @@ export default class User extends BaseModel {
   @column()
   token_created_at: Date | null;
 
+  @column()
+  last_game_date: Date;
+
   @hasMany(() => Gamble, {
     foreignKey: 'user_id', // defaults to userId
   })
