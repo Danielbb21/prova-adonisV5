@@ -3,7 +3,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User';
 import CreateUserValidator from 'App/Validators/CreateUserValidator';
 import UpdateUserValidator from 'App/Validators/UpdateUserValidator';
-import { addWeeks, subWeeks } from 'date-fns';
+import { subWeeks } from 'date-fns';
 
 const formatDate2 = (date) => {
   const dateSeperated = date.split('/');
@@ -91,8 +91,6 @@ export default class UsersController {
     const user = await User.query().where('isAdmin', false);
     const users2 = await User.query().where('isAdmin', false).andWhereIn('id', User.query().where('last_game_date' ,'<', dateOneWeekMore ).orWhereNull('last_game_date').select('id'));
 
-
-    const emails = users2.map(user => user.email);
     users2.map(async(user) => {
         console.log(user.name)
       await Mail.sendLater((message) => {
