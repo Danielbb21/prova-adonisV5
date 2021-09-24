@@ -24,7 +24,7 @@ export default class GamesController {
 
     await game.merge(data).save();
 
-    return game;
+    return response.status(201).json(game);
   }
 
   public async index({ response }: HttpContextContract) {
