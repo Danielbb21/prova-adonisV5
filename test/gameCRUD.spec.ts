@@ -363,5 +363,47 @@ test.group('Games\' CRUD ', () => {
     assert.notEqual(data.status, 200);
   })
 
+  // test('teste', async(assert) => {
+  //   const game = new Game;
+  //   game.type = 'teste teste123';
+  //   game.description = 'teste description';
+  //   game.range = 10;
+  //   game.price = 10;
+  //   game.maxNumber = 5;
+  //   game.color = 'red';
+  //   game.minCartValue = 30;
+  //   await game.save();
+
+  //   const user = new User();
+  //   user.name = 'user223456';
+  //   user.email = 'user2223456@teste.com';
+  //   user.password = 'secret';
+  //   user.isAdmin = true;
+  //   await user.save();
+
+  //   const auth = await supertest(BASE_URL).post('/login').send({
+  //     email: user.email,
+  //     password: 'secret'
+  //   });
+  //   const { token } = auth.body.token;
+  //   const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
+  //     data: [
+
+  //       {
+  //           gameNumbers: [1,2,8,9,12],
+  //     price: 30,
+  //     game_date: "2021-9-21 23:59:17",
+  //       game_id: game.id
+  //       },
+  //         {
+  //         gameNumbers: [1,2,8,9,12],
+  //     price: 30,
+  //     game_date: "2021-9-21 23:59:17",
+  //       game_id: game.id
+  //       }
+  //     ]
+  //   })
+  //   console.log('DATA STATUS', data.status);
+  // })
 
 })
