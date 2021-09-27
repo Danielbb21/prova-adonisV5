@@ -2,10 +2,23 @@ import test from 'japa'
 // import { JSDOM } from 'jsdom'
 import supertest from 'supertest'
 import User from 'App/Models/User'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 
-test.group('Create User', () => {
+test.group('Create User',  (group) => {
+
+  group.beforeEach(async () => {
+
+    await Database.beginGlobalTransaction()
+  })
+
+  group.afterEach(async () => {
+
+    await Database.rollbackGlobalTransaction()
+
+  })
+
   test('Should create a user', async (assert) => {
     const data = await supertest(BASE_URL).post('/users').send({
       name: 'Daniel',
@@ -25,7 +38,7 @@ test.group('Create User', () => {
 
     assert.notEqual(user.password, '123456')
   })
-  test('Should not return password in the route return', async (assert) =>{
+  test('Should not return password in the route return', async (assert) => {
     const data = await supertest(BASE_URL).post('/users').send({
       name: 'Daniel',
       email: 'daniel1@teste.com',
@@ -33,7 +46,7 @@ test.group('Create User', () => {
       password_confirmation: '123456',
       isAdmin: true
     });
-    const {body} = data;
+    const { body } = data;
 
     assert.notProperty(body, 'password');
   })
@@ -50,4 +63,15 @@ test.group('Create User', () => {
     assert.notEqual(data.status, 201);
   })
 
+  test('Should not permite create user using a non valid Email', async (assert) => {
+    const data = await supertest(BASE_URL).post('/users').send({
+      name: 'Daniel',
+      email: 'daniel',
+      password: '123456',
+      password_confirmation: '123456',
+      isAdmin: true
+    });
+
+    assert.notEqual(data.status, 201);
+  })
 })

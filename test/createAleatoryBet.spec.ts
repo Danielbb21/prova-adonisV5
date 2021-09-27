@@ -27,6 +27,20 @@ test.group('Create Bet', (group) => {
   group.beforeEach(async () => {
 
     await Database.beginGlobalTransaction()
+    const game = new Game();
+    const aleadyExists = await Game.findBy('type', 'Mega-Sena');
+    if (!aleadyExists) {
+      game.type = 'Mega-Sena';
+      game.description = 'Escolha 6 números dos 60 disponíveis na mega-sena. Ganhe com 6, 5 ou 4 acertos. São realizados dois sorteios semanais para você apostar e torcer para ficar milionário.';
+      game.range = 60;
+      game.price = 4.5;
+      game.maxNumber = 6;
+      game.color = '#01AC66';
+      game.minCartValue = 30;
+
+      await game.save();
+    }
+
   })
 
   group.afterEach(async () => {
@@ -76,17 +90,20 @@ test.group('Create Bet', (group) => {
   })
 
   test('Should create a mega-sena game with aleatory numbers', async (assert) => {
-    const game = new Game();
-    game.type = 'Mega-Sena';
-    game.description = 'Escolha 6 números dos 60 disponíveis na mega-sena. Ganhe com 6, 5 ou 4 acertos. São realizados dois sorteios semanais para você apostar e torcer para ficar milionário.';
-    game.range = 60;
-    game.price = 4.5;
-    game.maxNumber = 6;
-    game.color = '#01AC66';
-    game.minCartValue = 30;
+    // const game = new Game();
+    // game.type = 'Mega-Sena';
+    // game.description = 'Escolha 6 números dos 60 disponíveis na mega-sena. Ganhe com 6, 5 ou 4 acertos. São realizados dois sorteios semanais para você apostar e torcer para ficar milionário.';
+    // game.range = 60;
+    // game.price = 4.5;
+    // game.maxNumber = 6;
+    // game.color = '#01AC66';
+    // game.minCartValue = 30;
 
-    await game.save();
-
+    // await game.save();
+    const mega = await Game.findBy('type', 'Mega-Sena');
+    if (!mega) {
+      return;
+    }
     const user = new User();
     user.email = 'teste@teste1.com';
     user.password = 'secret';
@@ -98,7 +115,7 @@ test.group('Create Bet', (group) => {
       password: 'secret'
     });
     const { token } = auth.body.token;
-    const aleatoryNumbers = sortNumbers(game.maxNumber, game.range);
+    const aleatoryNumbers = sortNumbers(mega.maxNumber, mega.range);
     const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
       data: [
 
@@ -106,7 +123,7 @@ test.group('Create Bet', (group) => {
           gameNumbers: aleatoryNumbers,
           price: 30,
           game_date: "2021-9-21 23:59:17",
-          game_id: game.id
+          game_id: mega.id
         }
       ]
     })
