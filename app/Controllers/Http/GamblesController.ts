@@ -25,19 +25,12 @@ const formatDate = (date) => {
   return `${day}/${month}/${year}`;
 }
 
-// const formatDate2 = (date) => {
-//   const dateSeperated = date.split('/');
-//   const day = dateSeperated[0];
-//   const month = dateSeperated[1];
-//   const year = dateSeperated[2];
 
-//   return `${year}-${month}-${day}`;
-// }
 
 export default class GamblesController {
 
   public async store({ request, response, auth }: HttpContextContract) {
-    console.log('Aquiiii');
+
 
     const data = request.only(['data']);
     await request.validate(CreateGambleValidator);
@@ -55,7 +48,7 @@ export default class GamblesController {
 
 
         data.data.map(element => {
-          console.log('element', element);
+
           const a = new Gamble();
           a.gameNumbers = element.gameNumbers.toString();
           a.price = element.price;
@@ -70,7 +63,7 @@ export default class GamblesController {
 
         const games = await Game.all();
         const teste = data.data.map((element) => {
-          console.log('element', element);
+
 
           return { ...element, gameNumbers: element.gameNumbers.toString(), user_id:  1}
         });
@@ -78,8 +71,7 @@ export default class GamblesController {
         for (let i = 0; i < teste.length; i++) {
           let teste3 = { ...teste[i], type: '', color: '', maxNumber: 0 };
           for (let j = 0; j < games.length; j++) {
-            console.log(teste[i].game_id,  games[j].id);
-            console.log(teste[i].game_id ===  games[j].id);
+
             if (teste[i].game_id === games[j].id) {
 
               teste3.type = games[j].type
@@ -90,34 +82,28 @@ export default class GamblesController {
             }
           }
         }
-        console.log('teste2', teste2);
+
         teste2.map((game) => {
 
           const gameType = games.find(gm => gm.type === game.type);
-          console.log('gameTyoe', gameType?.maxNumber);
+
           if(!gameType) {
-            console.log('notttt');
+
             return;
           }
           const numbers = game.gameNumbers.toString().split(',');
           // numbers.map(num => {
-          //   console.log('num', num);
+
           // });
          numbers.map(num => {
            if(+num > gameType.range){
              throw new Error('number out of bounds');
            }
          })
-          console.log(gameType.maxNumber, game.gameNumbers.toString().split(',').length)
+
           if (gameType.maxNumber !== game.gameNumbers.toString().split(',').length) {
             throw new Error('mismatched game numbers')
           }
-          // game.gameNumbers.map(num => {
-          //   if(num > gameType.range){
-          //     throw new Error('number out of bounds')
-          //   }
-          // });
-          // console.log('game', game.gameNumbers.length);
 
         })
 
@@ -127,17 +113,6 @@ export default class GamblesController {
 
         // user.last_game_date = Date.parse('2021-09-14T18:11:00.763Z');
         await user.related('gambles').saveMany(k);
-
-
-        // k.map((game) => {
-        //   console.log('aquiii');
-        //   const gameType = games.find(gm => gm.type === game.game.type);
-        //   console.log(gameType!['max-number'], game.gameNumbers.split(',').length)
-        //   if(!gameType) return;
-        //   if (gameType['max-number'] !== game.gameNumbers.split(',').length) {
-        //     throw new Error('mismatched game numbers')
-        //   }
-        // })
 
         const returnedElemenents = k.map((element) => {
           const game = games.find(g => g.id === element.game_id);
@@ -167,9 +142,9 @@ export default class GamblesController {
 
     if (auth.user?.id) {
 
-      console.log('aqui');
 
-      console.log(request.qs());
+
+
       const { page } = request.qs();
       const gambles = await Gamble.query().where('user_id', auth.user.id).preload('user').preload('game').paginate(page, 10);
 

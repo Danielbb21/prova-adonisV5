@@ -25,14 +25,14 @@ const sortNumbers = (max: number, range: number) => {
 }
 test.group('Create Bet', (group) => {
   group.beforeEach(async () => {
-    console.log('INICIO')
+
     await Database.beginGlobalTransaction()
   })
 
   group.afterEach(async () => {
-    console.log('FIM')
-    const ok = await Database.rollbackGlobalTransaction()
-    console.log('ok', ok);
+
+    await Database.rollbackGlobalTransaction()
+
   })
   test('Should not create a bet when is not authenticated', async (assert) => {
 
@@ -71,8 +71,7 @@ test.group('Create Bet', (group) => {
         }
       ]
     })
-    // console.log(data);
-    // console.log(data.status);
+
     assert.equal(data.status, 401);
   })
 
@@ -111,7 +110,7 @@ test.group('Create Bet', (group) => {
         }
       ]
     })
-    console.log(data.body);
+
     assert.equal(data.status, 200);
   })
 
@@ -132,17 +131,17 @@ test.group('Create Bet', (group) => {
     user.isAdmin = true;
     await user.save();
     const mega = await Game.findBy('type', 'Mega-Sena');
-    if(!mega){
+    if (!mega) {
       return;
     }
-    console.log(mega.type, mega.id);
+
     const auth = await supertest(BASE_URL).post('/login').send({
       email: user.email,
       password: 'secret'
     });
     const { token } = auth.body.token;
-    const aleatoryNumbers = sortNumbers(mega.maxNumber+1, mega.range);
-    console.log('aleatory numbers', aleatoryNumbers);
+    const aleatoryNumbers = sortNumbers(mega.maxNumber + 1, mega.range);
+
 
     const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
       data: [
@@ -155,7 +154,7 @@ test.group('Create Bet', (group) => {
         }
       ]
     })
-    console.log(data.body);
+
     assert.equal(data.status, 400);
   })
 
@@ -176,17 +175,17 @@ test.group('Create Bet', (group) => {
     user.isAdmin = true;
     await user.save();
     const mega = await Game.findBy('type', 'Mega-Sena');
-    if(!mega){
+    if (!mega) {
       return;
     }
-    console.log(mega.type, mega.id);
+
     const auth = await supertest(BASE_URL).post('/login').send({
       email: user.email,
       password: 'secret'
     });
     const { token } = auth.body.token;
-    const aleatoryNumbers = sortNumbers(mega.maxNumber-1, mega.range);
-    console.log('aleatory numbers', aleatoryNumbers);
+    const aleatoryNumbers = sortNumbers(mega.maxNumber - 1, mega.range);
+
 
     const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
       data: [
@@ -199,7 +198,7 @@ test.group('Create Bet', (group) => {
         }
       ]
     })
-    console.log(data.body);
+
     assert.equal(data.status, 400);
   })
 
@@ -220,18 +219,18 @@ test.group('Create Bet', (group) => {
     user.isAdmin = true;
     await user.save();
     const mega = await Game.findBy('type', 'Mega-Sena');
-    if(!mega){
+    if (!mega) {
       return;
     }
-    console.log(mega.type, mega.id);
+
     const auth = await supertest(BASE_URL).post('/login').send({
       email: user.email,
       password: 'secret'
     });
     const { token } = auth.body.token;
-    const aleatoryNumbers = sortNumbers(mega.maxNumber-1, mega.range);
+    const aleatoryNumbers = sortNumbers(mega.maxNumber - 1, mega.range);
     aleatoryNumbers.push(mega.range + 5);
-    console.log('aleatory numbers', aleatoryNumbers);
+
 
     const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
       data: [
@@ -244,7 +243,7 @@ test.group('Create Bet', (group) => {
         }
       ]
     })
-    console.log(data.body);
+
     assert.equal(data.status, 400);
   })
 })

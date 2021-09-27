@@ -15,7 +15,7 @@ test.group('Create User', () => {
       isAdmin: true
     });
     assert.equal(data.status, 201);
-    // console.log(data.body);
+
   })
   test('Should encrypt user password when create', async (assert) => {
     const user = new User()

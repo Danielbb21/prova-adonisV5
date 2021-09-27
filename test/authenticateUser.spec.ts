@@ -26,7 +26,7 @@ test.group('Authenticate User', () => {
     });
 
     const { body } = data1;
-    console.log('data', body);
+
     assert.property(body, 'token');
 
   })
