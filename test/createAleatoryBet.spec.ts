@@ -3,6 +3,8 @@ import test from 'japa'
 import supertest from 'supertest'
 import User from 'App/Models/User'
 import Game from 'App/Models/Game';
+import Database from '@ioc:Adonis/Lucid/Database';
+
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`;
 const sortNumbers = (max: number, range: number) => {
@@ -21,7 +23,17 @@ const sortNumbers = (max: number, range: number) => {
   return arrayOfChosenNumbers;
 
 }
-test.group('Create Bet', () => {
+test.group('Create Bet', (group) => {
+  group.beforeEach(async () => {
+    console.log('INICIO')
+    await Database.beginGlobalTransaction()
+  })
+
+  group.afterEach(async () => {
+    console.log('FIM')
+    const ok = await Database.rollbackGlobalTransaction()
+    console.log('ok', ok);
+  })
   test('Should not create a bet when is not authenticated', async (assert) => {
 
     const game = new Game;
@@ -41,11 +53,7 @@ test.group('Create Bet', () => {
     user.isAdmin = true;
     await user.save();
 
-    const auth = await supertest(BASE_URL).post('/login').send({
-      email: user.email,
-      password: 'secret'
-    });
-    const { token } = auth.body.token;
+
     const data = await supertest(BASE_URL).post('/gamble').send({
       data: [
 
@@ -79,6 +87,7 @@ test.group('Create Bet', () => {
     game.minCartValue = 30;
 
     await game.save();
+
     const user = new User();
     user.email = 'teste@teste1.com';
     user.password = 'secret';
@@ -106,7 +115,136 @@ test.group('Create Bet', () => {
     assert.equal(data.status, 200);
   })
 
-  test('Should not create a mega-sena game with wrong numbers', async(assert) => {
+  test('Should not create a mega-sena game with more numbers than expected', async (assert) => {
+    // const game = new Game();
+    // game.type = 'Mega-Sena';
+    // game.description = 'Escolha 6 números dos 60 disponíveis na mega-sena. Ganhe com 6, 5 ou 4 acertos. São realizados dois sorteios semanais para você apostar e torcer para ficar milionário.';
+    // game.range = 60;
+    // game.price = 4.5;
+    // game.maxNumber = 6;
+    // game.color = '#01AC66';
+    // game.minCartValue = 30;
 
+    // await game.save();
+    const user = new User();
+    user.email = 'teste@teste123.com';
+    user.password = 'secret';
+    user.isAdmin = true;
+    await user.save();
+    const mega = await Game.findBy('type', 'Mega-Sena');
+    if(!mega){
+      return;
+    }
+    console.log(mega.type, mega.id);
+    const auth = await supertest(BASE_URL).post('/login').send({
+      email: user.email,
+      password: 'secret'
+    });
+    const { token } = auth.body.token;
+    const aleatoryNumbers = sortNumbers(mega.maxNumber+1, mega.range);
+    console.log('aleatory numbers', aleatoryNumbers);
+
+    const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
+      data: [
+
+        {
+          gameNumbers: aleatoryNumbers,
+          price: 30,
+          game_date: "2021-9-21 23:59:17",
+          game_id: mega.id
+        }
+      ]
+    })
+    console.log(data.body);
+    assert.equal(data.status, 400);
+  })
+
+  test('Should not create a mega-sena game with less numbers than expected', async (assert) => {
+    // const game = new Game();
+    // game.type = 'Mega-Sena';
+    // game.description = 'Escolha 6 números dos 60 disponíveis na mega-sena. Ganhe com 6, 5 ou 4 acertos. São realizados dois sorteios semanais para você apostar e torcer para ficar milionário.';
+    // game.range = 60;
+    // game.price = 4.5;
+    // game.maxNumber = 6;
+    // game.color = '#01AC66';
+    // game.minCartValue = 30;
+
+    // await game.save();
+    const user = new User();
+    user.email = 'teste@teste12345.com';
+    user.password = 'secret';
+    user.isAdmin = true;
+    await user.save();
+    const mega = await Game.findBy('type', 'Mega-Sena');
+    if(!mega){
+      return;
+    }
+    console.log(mega.type, mega.id);
+    const auth = await supertest(BASE_URL).post('/login').send({
+      email: user.email,
+      password: 'secret'
+    });
+    const { token } = auth.body.token;
+    const aleatoryNumbers = sortNumbers(mega.maxNumber-1, mega.range);
+    console.log('aleatory numbers', aleatoryNumbers);
+
+    const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
+      data: [
+
+        {
+          gameNumbers: aleatoryNumbers,
+          price: 30,
+          game_date: "2021-9-21 23:59:17",
+          game_id: mega.id
+        }
+      ]
+    })
+    console.log(data.body);
+    assert.equal(data.status, 400);
+  })
+
+  test('Should not create a mega-sena game with numbers greater than range', async (assert) => {
+    // const game = new Game();
+    // game.type = 'Mega-Sena';
+    // game.description = 'Escolha 6 números dos 60 disponíveis na mega-sena. Ganhe com 6, 5 ou 4 acertos. São realizados dois sorteios semanais para você apostar e torcer para ficar milionário.';
+    // game.range = 60;
+    // game.price = 4.5;
+    // game.maxNumber = 6;
+    // game.color = '#01AC66';
+    // game.minCartValue = 30;
+
+    // await game.save();
+    const user = new User();
+    user.email = 'teste@teste1234.com';
+    user.password = 'secret';
+    user.isAdmin = true;
+    await user.save();
+    const mega = await Game.findBy('type', 'Mega-Sena');
+    if(!mega){
+      return;
+    }
+    console.log(mega.type, mega.id);
+    const auth = await supertest(BASE_URL).post('/login').send({
+      email: user.email,
+      password: 'secret'
+    });
+    const { token } = auth.body.token;
+    const aleatoryNumbers = sortNumbers(mega.maxNumber-1, mega.range);
+    aleatoryNumbers.push(mega.range + 5);
+    console.log('aleatory numbers', aleatoryNumbers);
+
+    const data = await supertest(BASE_URL).post('/gamble').set('Authorization', `Bearer ${token}`).send({
+      data: [
+
+        {
+          gameNumbers: aleatoryNumbers,
+          price: 30,
+          game_date: "2021-9-21 23:59:17",
+          game_id: mega.id
+        }
+      ]
+    })
+    console.log(data.body);
+    assert.equal(data.status, 400);
   })
 })
